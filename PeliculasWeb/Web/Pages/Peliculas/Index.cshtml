@@ -1,0 +1,123 @@
+﻿@page
+@model Web.Pages.Peliculas.IndexModel
+@{
+}
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+<header class="subhead">
+    <div class="container">
+        <div class="masthead-subheading">Caso practico 2</div>
+        <div class="masthead-heading text-uppercase">Peliculas</div>
+    </div>
+</header>
+
+
+<div class="modal fade" id="modalFormularioPeliFav" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" id="contenidoModal">
+        </div>
+    </div>
+</div>
+
+<section class="page-section bg-light" id="principal">
+    <div class="container">
+        <div class="text-center">
+            <h2 class="section-heading text-uppercase">Listado de pelicualas</h2>
+        </div>
+        <div>
+            <form method="post">
+                <input type="number" name="id" class="form-control" required />
+                
+                <button type="submit" class="btn btn-primary mt-3">Buscar</button>
+
+             </form>
+        </div>
+        
+        <div class="row">
+            @if (Model.peliculas != null && Model.peliculas.Any())
+            {
+                @foreach (var pelicula in Model.peliculas)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card tamano-cards">
+                            <div class="card-body">
+                                <button class="btn btn-outline-danger btn-agregar-fav align-items-end"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalFormularioPeliFav"
+                                        data-url="/Peliculas?handler=FormularioModal&id=@pelicula.Id">
+                                    <i class="bi bi-heart-fill"></i>
+                                </button>
+                                <h5 class="card-title"><i class="bi bi-bookmark-star-fill"></i> @Html.DisplayFor(p => pelicula.Titulo)</h5>
+                                <div class="mt-4">
+                                    <img src="@($"https://image.tmdb.org/t/p/w500{pelicula.Imagen}")" alt="Poster de película" class="img-fluid rounded" style="width: 200px; height: 300px; object-fit: cover;" />
+                                </div>
+                                <div class="card-text mb-3">
+                                    
+                                    <p><strong>Descripcion:</strong>@Html.DisplayFor(p => pelicula.Descripcion)</p>
+                                    <p><strong>Calificacion:</strong>@Html.DisplayFor(p => pelicula.Calificacion)</p>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-warning" role="alert">
+                    No hay peliculas
+                </div>
+            }
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <script>
+        var antiForgeryToken = '@Antiforgery.GetAndStoreTokens(HttpContext).RequestToken';
+    </script>
+    <script>
+        const modal = $('#modalFormularioPeliFav');
+                $('#modalFormularioPeliFav').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);        
+            var url = button.data('url');               
+
+            $.get(url, function (html) {
+                $('#contenidoModal').html(html);        
+            });
+        });
+        $(document).on('submit', '#formPeliculaFav', function (e) {
+            e.preventDefault(); 
+
+            var $form = $(this);
+            var url = $form.attr('action');
+            var formData = new FormData(this);
+            console.log(url);
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                processData: false,  
+                contentType: false,
+                headers: {
+            'RequestVerificationToken': antiForgeryToken
+        },
+                success: function (response) {
+                    
+                    
+                    if (response.success) {
+                        
+                        location.reload(); 
+                    } else {
+                        
+                        $('#contenidoModal').html(response);
+                    }
+                },
+                error: function (xhr) {
+                    
+                    $('#contenidoModal').html(xhr.responseText);
+                }
+            });
+        });
+
+    </script>
+    }
