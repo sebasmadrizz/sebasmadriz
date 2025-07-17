@@ -1,0 +1,52 @@
+﻿@page
+@model Web.Pages.Peliculas.verPeliculasFavModel
+@{
+}
+<section class="page-section bg-light" id="principal">
+    <div class="container">
+        <div class="text-center">
+            <h2 class="section-heading ">Listado de mis pelicualas favoritas</h2>
+        </div>
+        <div>
+            <form method="post">
+                <input type="text" name="username" class="form-control" required />
+
+                <button type="submit" class="btn btn-primary mt-3">Buscar</button>
+
+            </form>
+        </div>
+
+        <div class="row">
+            @if (Model.peliculasFav != null && Model.peliculasFav.Any())
+            {
+                @foreach (var pelicula in Model.peliculasFav)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card tamano-cards">
+                            <div class="card-body">
+                                
+                                <h5 class="card-title"><i class="bi bi-bookmark-star-fill"></i> @Html.DisplayFor(p => pelicula.Titulo)</h5>
+                                <div class="mt-4">
+                                    <img src="@($"https://image.tmdb.org/t/p/w500{pelicula.Imagen}")" alt="Poster de película" class="img-fluid rounded" style="width: 200px; height: 300px; object-fit: cover;" />
+                                </div>
+                                <div class="card-text mb-3">
+
+                                    <p><strong>Descripcion:</strong>@Html.DisplayFor(p => pelicula.Descripcion)</p>
+                                    <p><strong>Comentario:</strong>@Html.DisplayFor(p => pelicula.Comentario)</p>
+                                    <p><strong>Mi puntuacion:</strong>@Html.DisplayFor(p => pelicula.Puntuacion)</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-warning" role="alert">
+                    No hay peliculas
+                </div>
+            }
+        </div>
+    </div>
+</section>
